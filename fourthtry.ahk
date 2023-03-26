@@ -19,8 +19,7 @@ CapsLock::
         Hotkey, 8, F8, On
         Hotkey, 9, F9, On
         Hotkey, 0, F10, On
-        ; Change keyboard color when toggled on
-        SendInput {Blind}{Fn down}{m down}{m up}{Fn up}
+        
     } Else {
         ; Disable number row hotkeys when toggled off
         Hotkey, 1, F1, Off
