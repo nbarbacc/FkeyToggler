@@ -1,6 +1,25 @@
 SendMode Input
 SetWorkingDir %A_ScriptDir%
 
+
+
+
+
+
+
+
+
+; Toggle LEDs left to right when the toggle is activated
+CycleLEDs:
+    SetScrollLockState, % GetKeyState("ScrollLock", "T") ? "Off" : "On"
+    Sleep, 250
+    SetNumLockState, % GetKeyState("NumLock", "T") ? "Off" : "On"
+    Sleep, 250
+    SetCapsLockState, % GetKeyState("CapsLock", "T") ? "Off" : "On"
+    Sleep, 250
+    return
+
+
 ; Define initial state of Toggle
 Toggle := 0
 
@@ -8,6 +27,9 @@ Toggle := 0
 $CapsLock::
     Toggle := !Toggle
     If (Toggle) {
+        Gosub, CycleLEDs
+
+    
         ; Map number row keys to corresponding F keys
         Hotkey, 1, F1, On
         Hotkey, 2, F2, On
@@ -18,15 +40,6 @@ $CapsLock::
         Hotkey, 7, F7, On
         Hotkey, 8, F8, On
         Hotkey, 9, F9, On
-
-        ; Create a semi-transparent GUI window with a label to display the new keymaps
-        Gui +LastFound +AlwaysOnTop +ToolWindow
-        Gui Color, FFFFFF
-        Gui Add, Text, x5 y5 w300 h150 +Wrap, +bold, F1 = 1 `nF2 = 2 `nF3 = 3 `nF4 = 4 `nF5 = 5 `nF6 = 6 `nF7 = 7 `nF8 = 8 `nF9 = 9
-    
-
-        Gui Show, x5 y5 NoActivate
-        WinSet, Transparent, 200
     } Else {
         ; Disable number row hotkeys when toggled off
         Hotkey, 1, F1, Off
@@ -38,9 +51,6 @@ $CapsLock::
         Hotkey, 7, F7, Off
         Hotkey, 8, F8, Off
         Hotkey, 9, F9, Off
-        
-        ; Hide the GUI window when toggled off
-        Gui Hide
     }
     Gosub, RemoveToolTip
     Return
