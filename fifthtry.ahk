@@ -4,8 +4,10 @@ SetWorkingDir %A_ScriptDir%
 ; Define initial state of Toggle
 Toggle := 0
 
+
+
 ; Toggle number row and F key mode with LCtrl
-LCtrl::
+$LCtrl::
     Toggle := !Toggle
     If (Toggle) {
         ; Map number row keys to corresponding F keys
@@ -36,16 +38,46 @@ LCtrl::
     Gosub, RemoveToolTip
     Return
 
-F1::Send {F1}
-F2::Send {F2}
-F3::Send {F3}
-F4::Send {F4}
-F5::Send {F5}
-F6::Send {F6}
-F7::Send {F7}
-F8::Send {F8}
-F9::Send {F9}
-F10::Send {F10}
+F1:
+    SendLevel 1
+    Send {F1}
+    Return
+F2:
+    SendLevel 1
+    Send {F2}
+    Return
+F3:
+    SendLevel 1
+    Send {F3}
+    Return
+F4:
+    SendLevel 1
+    Send {F4}
+    Return
+F5:
+    SendLevel 1
+    Send {F5}
+    Return
+F6:
+    SendLevel 1
+    Send {F6}
+    Return
+F7:
+    SendLevel 1
+    Send {F7}
+    Return
+F8:
+    SendLevel 1
+    Send {F8}
+    Return
+F9:
+    SendLevel 1
+    Send {F9}
+    Return
+F10:
+    SendLevel 1
+    Send {F10}
+    Return
 
 ; Display tooltip to indicate toggle status at cursor position
 RemoveToolTip:
@@ -58,4 +90,6 @@ HideToolTip:
     ToolTip
     SetTimer, HideToolTip, Off
     return
+
+#IfWinActive
 
