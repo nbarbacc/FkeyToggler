@@ -1,95 +1,71 @@
+global Toggle := 0
+global KeyMappingsFile := "key_mappings.txt"
+global FKeys := ["F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8", "F9"]
+
 SendMode Input
 SetWorkingDir %A_ScriptDir%
 
-; Define initial state of Toggle
-Toggle := 0
+LoadKeyMappings() {
+    ; Try to read key mappings from file
+    if !FileExist(KeyMappingsFile)
+        return {"1": "F1", "2": "F2", "3": "F3", "4": "F4", "5": "F5", "6": "F6", "7": "F7", "8": "F8", "9": "F9"}
 
-; Toggle number row and F key mode with Capslock
+    FileRead, KeyMappings, %KeyMappingsFile%
+    ; Try to parse the key mappings as JSON
+    try {
+        return JSON.parse(KeyMappings)
+    } catch {
+        MsgBox, 16, Error, Invalid key mappings in file. Using default key mappings.
+        return {"1": "F1", "2": "F2", "3": "F3", "4": "F4", "5": "F5", "6": "F6", "7": "F7", "8": "F8", "9": "F9"}
+    }
+}
+
+UpdateKeyMappings() {
+    ; Initialize an empty string to store the key mappings
+    mappings := ""
+
+    ; Iterate through the KeyMappings object
+    for fkey, numkey in KeyMappings {
+        ; Check if the current F key hotkey matches the F key value in KeyMappings
+        if (A_ThisHotkey = fkey) {
+            ; If it matches, add the corresponding number row key and F key to the mappings string
+            mappings .= numkey . " = " . fkey . "`n"
+            break  ; Exit the loop once a match is found
+        }
+    }
+
+    ; Check if the GUI control exists before updating it
+    if WinExist("ahk_class AutoHotkeyGUI")
+        GuiControl, Text, myControl, %mappings%
+}
+
+LoadKeyMappings()
+
 $CapsLock::
     Toggle := !Toggle
     If (Toggle) {
         ; Map number row keys to corresponding F keys
-        Hotkey, 1, F1, On
-        Hotkey, 2, F2, On
-        Hotkey, 3, F3, On
-        Hotkey, 4, F4, On
-        Hotkey, 5, F5, On
-        Hotkey, 6, F6, On
-        Hotkey, 7, F7, On
-        Hotkey, 8, F8, On
-        Hotkey, 9, F9, On
+        for key, value in KeyMappings {
+            Hotkey, %key%, %value%, On
+        }
 
         ; Create a semi-transparent GUI window with a label to display the new keymaps
         Gui +LastFound +AlwaysOnTop +ToolWindow
         Gui Color, FFFFFF
-        Gui Add, Text, x5 y5 w300 h150 +Wrap, +bold, F1 = 1 `nF2 = 2 `nF3 = 3 `nF4 = 4 `nF5 = 5 `nF6 = 6 `nF7 = 7 `nF8 = 8 `nF9 = 9
-    
-
+        Gui Add, Text, x5 y5 w300 h150 +Wrap, myControl
+        Gui Add, Button, x5 y160 w100 h30, Settings
         Gui Show, x5 y5 NoActivate
         WinSet, Transparent, 200
+
+        ; Update the GUI window with the current key mappings
+        UpdateKeyMappings()
     } Else {
         ; Disable number row hotkeys when toggled off
-        Hotkey, 1, F1, Off
-        Hotkey, 2, F2, Off
-        Hotkey, 3, F3, Off
-        Hotkey, 4, F4, Off
-        Hotkey, 5, F5, Off
-        Hotkey, 6, F6, Off
-        Hotkey, 7, F7, Off
-        Hotkey, 8, F8, Off
-        Hotkey, 9, F9, Off
-        
+        for key, value in KeyMappings {
+            Hotkey, %key%, %value%, Off
+        }
+
         ; Hide the GUI window when toggled off
         Gui Hide
     }
-    Gosub, RemoveToolTip
-    Return
 
-F1:
-    SendLevel 1
-    Send {F1}
-    Return
-F2:
-    SendLevel 1
-    Send {F2}
-    Return
-F3:
-    SendLevel 1
-    Send {F3}
-    Return
-F4:
-    SendLevel 1
-    Send {F4}
-    Return
-F5:
-    SendLevel 1
-    Send {F5}
-    Return
-F6:
-    SendLevel 1
-    Send {F6}
-    Return
-F7:
-    SendLevel 1
-    Send {F7}
-    Return
-F8:
-    SendLevel 1
-    Send {F8}
-    Return
-F9:
-    SendLevel 1
-    Send {F9}
-    Return
-
-; Display tooltip to indicate toggle status at cursor position
-RemoveToolTip:
-    MouseGetPos, xpos, ypos
-    ToolTip % (Toggle ? "On" : "Off"), xpos+20, ypos+20
-    SetTimer, HideToolTip, 1000
-    return
-
-HideToolTip:
-    ToolTip
-    SetTimer, HideToolTip, Off
-    return
