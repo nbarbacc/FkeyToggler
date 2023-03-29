@@ -2,6 +2,8 @@ global Toggle := 0
 global KeyMappingsFile := "key_mappings.txt"
 global FKeys := ["F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8", "F9"]
 
+
+SetCapsLockState, AlwaysOff
 SendMode Input
 SetWorkingDir %A_ScriptDir%
 
